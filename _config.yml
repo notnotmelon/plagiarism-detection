@@ -1,3 +1,5 @@
 remote_theme: pages-themes/cayman@v0.2.0
 plugins:
 - jekyll-remote-theme # add this line to the plugins list if you already have one
+title: Hawkathon 2023 Plagiarism Detection Software
+description: Simple plagiarism detection for text, code, AI generated content, and more!
