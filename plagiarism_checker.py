@@ -28,10 +28,16 @@ def find_indexes(element, list):
 def find_plagiarism(plagiarised_text, urls):
     plagiarised_text = stopwords.preprocessing(plagiarised_text)
     plagiarised_tokens = plagiarised_text.split()
+    plagiarisized_substrings = []
+    unsearchable_urls = []
     for url in urls:
+        if 'www.youtube.com' in url:
+            unsearchable_urls.append(url)
+            continue
+
         try:
             html = BeautifulSoup(urlopen(url).read().decode('utf-8'), features = 'html.parser')
-            website_text = stopwords.preprocessing(html).get_text()
+            website_text = stopwords.preprocessing(html.get_text())
             website_tokens = website_text.split()
 
             i = 0
@@ -43,11 +49,10 @@ def find_plagiarism(plagiarised_text, urls):
                     if plagiarisism_score > highest_score:
                         highest_score = plagiarisism_score
                 if highest_score > 6:
-                    plagiarisized_substring = plagiarised_tokens[i:i+highest_score]
-                    print(' '.join(plagiarisized_substring), sep=' ')
-                    print('score: ' + str(highest_score))
+                    plagiarised_substring = ' '.join(plagiarised_tokens[i:i+highest_score])
+                    plagiarisized_substrings.append((plagiarised_substring, url))
                     del plagiarised_tokens[i:i+highest_score]
-                    print(plagiarised_tokens)
                 i += 1
-        except:
-            print(url + ' is not a valid url')
+        except Exception as e:
+            unsearchable_urls.append(url)
+    return plagiarisized_substrings, unsearchable_urls

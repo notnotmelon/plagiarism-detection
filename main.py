@@ -1,5 +1,5 @@
-import stopwords
 import google_search
+import plagiarism_checker
 
 text = '''
 It might seem crazy what I am 'bout to say
@@ -20,4 +20,12 @@ Well I should probably warn you I'll be just fine (Yeah)
 No offense to you don't waste your time
 Here's why'''
 
-#google_search.search(text, 10)
+top_urls = google_search.search(text, 10)
+if len(top_urls) == 0:
+    print('No results found')
+else:
+    plagiarisized_substrings, unsearchable_urls = plagiarism_checker.find_plagiarism(text, top_urls)
+    for substring, url in plagiarisized_substrings:
+        print(f'"{substring}" was plagiarized from {url}')
+    for url in unsearchable_urls:
+        print('Could not search ' + url)

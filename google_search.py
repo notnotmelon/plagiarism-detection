@@ -13,12 +13,11 @@ def tokenize(text):
     text = text.split()
     while len(text) > 0:
         tokens.append(' '.join(text[0:max_search_words]))
-        del text[0:int(max_search_words*0.75)]
+        del text[0:int(max_search_words*0.75)] # 0.75 allows some overlap between search queries
     return tokens
 
 def search(text, results_count):
     text = tokenize(stopwords.preprocessing(text))
-    print(text)
     queries = []
     for tokens in text:
         query = f'https://www.googleapis.com/customsearch/v1?key={api_key}&cx={cx}&q={tokens}&fields=items(title,link)'
@@ -39,6 +38,5 @@ def search(text, results_count):
             # score each link according to frequency of occurence & ranking in google search
             best_results[link] += (1/2)**ranking
             title_link_map[link] = item['title']
-    print(best_results)
-    top = sorted(best_results, key=best_results.get, reverse=True)[:results_count]
-    print(top)
+    top_urls = sorted(best_results, key=best_results.get, reverse=True)[:results_count]
+    return top_urls
