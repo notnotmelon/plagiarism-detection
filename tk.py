@@ -86,8 +86,6 @@ class App(ctk.CTk):
         self.scrollable_frame.grid(row=1, column=2, padx=(20, 20), pady=(20, 0), sticky='nsew')
         self.scrollable_frame.grid_columnconfigure(0, weight=1)
 
-        self.set_defaults()
-
     def open_input_dialog_event(self):
         dialog = ctk.CTkInputDialog(text='Type in a number:', title='CTkInputDialog')
         print('CTkInputDialog:', dialog.get_input())
