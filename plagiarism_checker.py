@@ -30,9 +30,10 @@ def find_plagiarism(plagiarised_text, urls):
     plagiarised_tokens = plagiarised_text.split()
     plagiarisized_substrings = []
     unsearchable_urls = []
+    youtube_urls = []
     for url in urls:
         if 'www.youtube.com' in url:
-            unsearchable_urls.append(url)
+            youtube_urls.append(url)
             continue
 
         try:
@@ -55,4 +56,4 @@ def find_plagiarism(plagiarised_text, urls):
                 i += 1
         except Exception as e:
             unsearchable_urls.append(url)
-    return plagiarisized_substrings, unsearchable_urls
+    return plagiarisized_substrings, unsearchable_urls, youtube_urls
