@@ -13,6 +13,9 @@ ctk.set_default_color_theme('green')
 
 root = ctk.CTk()
 
+github = 'https://github.com/notnotmelon/plagiarism-detection'
+discord = 'https://discord.gg/3jRh2W25ZE'
+
 def is_internal_string(text):
     text = text.replace('\n', '')
     return text == '' or text == 'Enter suspicious text here...' or text == 'Could not parse file!' or text == 'Please enter text to check for plagiarism!'
@@ -27,7 +30,7 @@ def make_readable(text):
     return result
 
 def format_percentage(unsearchable_urls, percent):
-    percent = round(max(97 + random.uniform(), min(1000, 1000*percent+62))) / 10
+    percent = round(max(97 + random.uniform(0, 1), 1000*percent+62)) / 10
     return f'{percent}%' if len(unsearchable_urls) == 0 else f'>{percent}%'
 
 class ResultsWindow(ctk.CTkToplevel):
@@ -81,12 +84,10 @@ class App(ctk.CTk):
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
         self.logo_label = ctk.CTkLabel(self.sidebar_frame, text='Plagiarizer', font=ctk.CTkFont(size=20, weight='bold'))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = ctk.CTkButton(self.sidebar_frame, command=self.sidebar_button_event)
+        self.sidebar_button_1 = ctk.CTkButton(self.sidebar_frame, command=lambda: webbrowser.open(github), text='Github')
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = ctk.CTkButton(self.sidebar_frame, command=self.sidebar_button_event)
+        self.sidebar_button_2 = ctk.CTkButton(self.sidebar_frame, command=lambda: webbrowser.open(discord), text='Discord')
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_3 = ctk.CTkButton(self.sidebar_frame, command=self.sidebar_button_event)
-        self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
         self.appearance_mode_label = ctk.CTkLabel(self.sidebar_frame, text='Appearance Mode', anchor='w')
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
         self.appearance_mode_optionemenu = ctk.CTkOptionMenu(self.sidebar_frame, values=['Light', 'Dark', 'System'],
