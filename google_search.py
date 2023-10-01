@@ -1,7 +1,7 @@
-import stopwords
 import requests
 
 # api key for google search api
+# plaintext :(   (pls dont abuse)
 api_key = 'AIzaSyBWd9hccN3Xkt5uDuHBTJWWurC-zMZT1to'
 
 # custom search engine id

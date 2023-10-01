@@ -56,9 +56,10 @@ def find_plagiarism(plagiarised_text, urls, event):
                     plagiarisism_score = calculate_plagiarisism_score(i + 1, index + 1, website_tokens, plagiarised_tokens)
                     if plagiarisism_score > highest_score:
                         highest_score = plagiarisism_score
-                if highest_score > 6:
+                if highest_score > 13:
                     plagiarised_substring = ' '.join(plagiarised_tokens[i:i+highest_score])
                     plagiarisized_substrings.append((plagiarised_substring, url))
+                    del plagiarised_tokens[i:i+highest_score]
                     i+=highest_score
                 i += 1
         except Exception as e:

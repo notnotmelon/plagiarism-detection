@@ -7,7 +7,7 @@ import webbrowser
 
 import google_search
 import plagiarism_checker
-ctk.set_appearance_mode('dark')
+ctk.set_appearance_mode('light')
 ctk.set_default_color_theme('green')
 
 root = ctk.CTk()
@@ -28,19 +28,30 @@ def make_readable(text):
 class ResultsWindow(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.geometry("800x300")
+        self.geometry("800x600")
+        # create scrollable frame
+        self.scroll = ctk.CTkScrollableFrame(self, label_text='Results', width=3000, height=600, corner_radius=0)
+        self.scroll.pack()
 
     def process_results(self, plagiarisized_substrings, unsearchable_urls):
+        if len(plagiarisized_substrings) == 0:
+            switch = ctk.CTkLabel(self.scroll, text='100% original!')
+            switch.pack(padx=20, pady=20)
+            switch = ctk.CTkLabel(self.scroll, text='We searched far and wide, but could not find any plagiarized text!')
+            switch.pack(padx=20, pady=0)
         for substring, url in plagiarisized_substrings:
             print(f'"{substring}" was plagiarized from {url}')
-            switch = ctk.CTkLabel(self, text=f'{make_readable(substring)}\n\nwas plagiarized from')
+            switch = ctk.CTkLabel(self.scroll, text=f'{make_readable(substring)}\n\nwas plagiarized from')
             switch.pack(padx=20, pady=20)
-            switch = ctk.CTkButton(self, text=url, command=lambda url=url: webbrowser.open(url), fg_color='transparent', border_width=0, text_color='blue')
+            switch = ctk.CTkButton(self.scroll, text=url, command=lambda url=url: webbrowser.open(url), fg_color='transparent', border_width=0, text_color='blue')
             switch.pack(padx=20, pady=0)
+        if len(unsearchable_urls) != 0:
+            switch = ctk.CTkLabel(self.scroll, text='Our webcrawler could not search the following websites.\nPlease ensure that the text you entered is not plagiarized from any of these websites.')
+            switch.pack(padx=20, pady=20)
         for url in unsearchable_urls:
             print('Could not search ' + url)
-            switch = ctk.CTkLabel(self, text='Could not search ' + url)
-            switch.pack(padx=20, pady=20)
+            switch = ctk.CTkButton(self.scroll, text=url, command=lambda url=url: webbrowser.open(url), fg_color='transparent', border_width=0, text_color='blue')
+            switch.pack(padx=20, pady=0)
         return self
 
 class App(ctk.CTk):
@@ -76,7 +87,7 @@ class App(ctk.CTk):
         self.scaling_optionemenu = ctk.CTkOptionMenu(self.sidebar_frame, values=['80%', '90%', '100%', '110%', '120%'],
                                                                command=self.change_scaling_event)
         self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
-        self.appearance_mode_optionemenu.set('Dark')
+        self.appearance_mode_optionemenu.set('Light')
         self.scaling_optionemenu.set('100%')
 
         # create main entry and button
@@ -104,11 +115,6 @@ class App(ctk.CTk):
         upload_button.grid(row=1, column=0, padx=10, pady=(0, 20))
         supported_types = ctk.CTkLabel(master=self.file_upload, text=f'*.pdf *.txt *.docx *.doc *.csv\nand more')
         supported_types.grid(row=2, column=0, padx=10, pady=(0, 20))
-
-        # create scrollable frame
-        self.scrollable_frame = ctk.CTkScrollableFrame(self, label_text='Results')
-        self.scrollable_frame.grid(row=1, column=2, padx=(20, 20), pady=(20, 0), sticky='nsew')
-        self.scrollable_frame.grid_columnconfigure(0, weight=1)
 
     def open_input_dialog_event(self):
         dialog = ctk.CTkInputDialog(text='Type in a number:', title='CTkInputDialog')
