@@ -4,10 +4,12 @@ import google_search
 
 app = Flask(__name__)
 
+url_count = 20
+
 @app.route('/plagiarism', methods=['GET'])
 def plagiarism():
     text = request.json['text']
-    top_urls = google_search.search(text, 10)
+    top_urls = google_search.search(text, url_count)
     if len(top_urls) == 0:
         return jsonify({'plagiarisized_substrings': [], 'unsearchable_urls': [], 'youtube_urls': []})
     plagiarisized_substrings, unsearchable_urls, youtube_urls = plagiarism_checker.find_plagiarism(text, top_urls)
