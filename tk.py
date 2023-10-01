@@ -141,13 +141,16 @@ class App(ctk.CTk):
         self.progressbar.configure(mode='determinnate')
         self.progressbar.set(1)
         self.progressbar.stop()
-        self.progressbar.orientation = 'horizontal'
-        self.progressbar.orientation = 'vertical'
         plagiarisized_substrings, unsearchable_urls = plagiarism_checker.results()
+        i = 0
         for substring, url in plagiarisized_substrings:
             print(f'"{substring}" was plagiarized from {url}')
+            switch = ctk.CTkLabel(master=self.scrollable_frame, text=f'"{substring}" was plagiarized from {url}')
+            switch.grid(row=i, column=0, padx=10, pady=(0, 20))
         for url in unsearchable_urls:
             print('Could not search ' + url)
+            switch = ctk.CTkLabel(master=self.scrollable_frame, text='Could not search ' + url)
+            switch.grid(row=i, column=0, padx=10, pady=(0, 20))
 
 if __name__ == '__main__':
     app = App()
