@@ -17,7 +17,7 @@ def tokenize(text):
     return tokens
 
 def search(text, results_count):
-    text = tokenize(stopwords.preprocessing(text))
+    text = tokenize(text)
     queries = []
     for tokens in text:
         query = f'https://www.googleapis.com/customsearch/v1?key={api_key}&cx={cx}&q={tokens}&fields=items(title,link)'
@@ -31,6 +31,8 @@ def search(text, results_count):
             r = s.get(query)
             results.append(r.json())
     for result in results:
+        if 'items' not in result:
+            continue
         for ranking, item in enumerate(result['items']):
             link = item['link']
             if link not in best_results:

@@ -2,6 +2,7 @@ from tkinter import *
 import customtkinter as ctk
 from tkinter import filedialog
 import fileparse
+import threading
 
 import google_search
 import plagiarism_checker
@@ -113,6 +114,8 @@ class App(ctk.CTk):
         self.textbox.insert('0.0', result)
 
     def check_plagiarism(self):
+        if plagiarism_checker.is_busy():
+            return
         text = self.textbox.get('0.0', END).replace('\n', '')
         if is_internal_string(text):
             self.textbox.delete('0.0', END)
@@ -121,14 +124,30 @@ class App(ctk.CTk):
         self.progressbar.configure(mode='indeterminnate')
         self.progressbar.start()
         top_urls = google_search.search(text, 10)
+        for url in top_urls:
+            print(url)
         if len(top_urls) == 0:
             print('No results found')
+            self.finish_check_plagiarism(None)
         else:
-            plagiarisized_substrings, unsearchable_urls, youtube_urls = plagiarism_checker.find_plagiarism(text, top_urls)
-            for substring, url in plagiarisized_substrings:
-                print(f'"{substring}" was plagiarized from {url}')
-            for url in unsearchable_urls:
-                print('Could not search ' + url)
+            event = threading.Event()
+            threading.Thread(target=lambda: plagiarism_checker.find_plagiarism(text, top_urls, event)).start()
+            threading.Thread(target=lambda: self.finish_check_plagiarism(event)).start()
+
+    def finish_check_plagiarism(self, event):
+        if event is not None:
+            event.wait()
+        print('Finished checking plagiarism')
+        self.progressbar.configure(mode='determinnate')
+        self.progressbar.set(1)
+        self.progressbar.stop()
+        self.progressbar.orientation = 'horizontal'
+        self.progressbar.orientation = 'vertical'
+        plagiarisized_substrings, unsearchable_urls = plagiarism_checker.results()
+        for substring, url in plagiarisized_substrings:
+            print(f'"{substring}" was plagiarized from {url}')
+        for url in unsearchable_urls:
+            print('Could not search ' + url)
 
 if __name__ == '__main__':
     app = App()
