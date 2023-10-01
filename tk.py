@@ -3,6 +3,8 @@ import customtkinter as ctk
 from tkinter import filedialog
 import fileparse
 
+import google_search
+import plagiarism_checker
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('green')
 
@@ -55,7 +57,7 @@ class App(ctk.CTk):
 
         # create main entry and button
         self.entry = ctk.CTkEntry(self, placeholder_text='CTkEntry')
-        self.entry.grid(row=3, column=1, columnspan=2, padx=(20, 0), pady=(20, 20), sticky='nsew')
+        self.entry.grid(row=3, column=1, columnspan=1, padx=(20, 0), pady=(20, 20), sticky='nsew')
         self.progressbar = ctk.CTkProgressBar(self)
         self.progressbar.grid(row=3, column=1, padx=(20, 00), pady=(20, 20), sticky='nsew')
         self.progressbar.set(1)
@@ -68,9 +70,23 @@ class App(ctk.CTk):
         self.textbox.grid(row=0, column=1, rowspan=2, padx=(20, 0), pady=(20, 0), sticky='nsew')
         self.textbox.insert('0.0', 'Enter suspicious text here...')
 
-        self.set_defaults()
+        # create tabview
+        self.file_upload = ctk.CTkFrame(self)
+        self.file_upload.grid(row=0, column=2, padx=(20, 20), pady=(20,0), sticky='nsew')
+        self.file_upload.grid_columnconfigure(0, weight=1)
+        or_label = ctk.CTkLabel(master=self.file_upload, text=f'Or...')
+        or_label.grid(row=0, column=0, padx=10, pady=(20, 20))
+        upload_button = ctk.CTkButton(master=self.file_upload, text='Upload File', command=self.upload_action)
+        upload_button.grid(row=1, column=0, padx=10, pady=(0, 20))
+        supported_types = ctk.CTkLabel(master=self.file_upload, text=f'*.pdf *.txt *.docx *.doc *.csv\nand more')
+        supported_types.grid(row=2, column=0, padx=10, pady=(0, 20))
 
-        self.add_funny()
+        # create scrollable frame
+        self.scrollable_frame = ctk.CTkScrollableFrame(self, label_text='Results')
+        self.scrollable_frame.grid(row=1, column=2, padx=(20, 20), pady=(20, 0), sticky='nsew')
+        self.scrollable_frame.grid_columnconfigure(0, weight=1)
+
+        self.set_defaults()
 
     def open_input_dialog_event(self):
         dialog = ctk.CTkInputDialog(text='Type in a number:', title='CTkInputDialog')
@@ -90,26 +106,6 @@ class App(ctk.CTk):
         self.destroy()
         exit()
 
-    def add_funny(self):
-        # create tabview
-        self.file_upload = ctk.CTkFrame(self)
-        self.file_upload.grid(row=0, column=2, padx=(20, 20), pady=(20,0), sticky='nsew')
-        self.file_upload.grid_columnconfigure(0, weight=1)
-        or_label = ctk.CTkLabel(master=self.file_upload, text=f'Or...')
-        or_label.grid(row=0, column=0, padx=10, pady=(20, 20))
-        upload_button = ctk.CTkButton(master=self.file_upload, text='Upload File', command=self.upload_action)
-        upload_button.grid(row=1, column=0, padx=10, pady=(0, 20))
-        supported_types = ctk.CTkLabel(master=self.file_upload, text=f'*.pdf *.txt *.docx *.doc *.csv\nand more')
-        supported_types.grid(row=2, column=0, padx=10, pady=(0, 20))
-
-        # create scrollable frame
-        self.scrollable_frame = ctk.CTkScrollableFrame(self, label_text='Results')
-        self.scrollable_frame.grid(row=1, column=2, padx=(20, 20), pady=(20, 0), sticky='nsew')
-        self.scrollable_frame.grid_columnconfigure(0, weight=1)
-
-    def set_defaults(self):
-        self.sidebar_button_3.configure(state='disabled', text='Disabled CTkButton')
-
     def upload_action(self):
         filename = filedialog.askopenfilename()
         result = fileparse.get_text(filename)
@@ -126,6 +122,15 @@ class App(ctk.CTk):
             return
         self.progressbar.configure(mode='indeterminnate')
         self.progressbar.start()
+        top_urls = google_search.search(text, 10)
+        if len(top_urls) == 0:
+            print('No results found')
+        else:
+            plagiarisized_substrings, unsearchable_urls, youtube_urls = plagiarism_checker.find_plagiarism(text, top_urls)
+            for substring, url in plagiarisized_substrings:
+                print(f'"{substring}" was plagiarized from {url}')
+            for url in unsearchable_urls:
+                print('Could not search ' + url)
 
 if __name__ == '__main__':
     app = App()
