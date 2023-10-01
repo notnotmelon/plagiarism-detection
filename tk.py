@@ -1,10 +1,16 @@
 from tkinter import *
 import customtkinter as ctk
+from tkinter import filedialog
+import fileparse
 
 ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('green')
 
 root = ctk.CTk()
+
+def is_internal_string(text):
+    text = text.replace('\n', '')
+    return text == '' or text == 'Enter suspicious text here...' or text == 'Could not parse file!' or text == 'Please enter text to check for plagiarism!'
 
 class App(ctk.CTk):
     def __init__(self):
@@ -50,8 +56,11 @@ class App(ctk.CTk):
         # create main entry and button
         self.entry = ctk.CTkEntry(self, placeholder_text='CTkEntry')
         self.entry.grid(row=3, column=1, columnspan=2, padx=(20, 0), pady=(20, 20), sticky='nsew')
+        self.progressbar = ctk.CTkProgressBar(self)
+        self.progressbar.grid(row=3, column=1, columnspan=2, padx=(20, 00), pady=(20, 20), sticky='nsew')
+        self.progressbar.set(1)
 
-        self.main_button_1 = ctk.CTkButton(master=self, fg_color='transparent', border_width=2, text_color=('gray10', '#DCE4EE'))
+        self.main_button_1 = ctk.CTkButton(master=self, fg_color='transparent', border_width=2, text_color=('gray10', '#DCE4EE'), text='Check Plagiarism', command=self.check_plagiarism)
         self.main_button_1.grid(row=3, column=3, padx=(20, 20), pady=(20, 20), sticky='nsew')
 
         # create textbox
@@ -88,9 +97,9 @@ class App(ctk.CTk):
         self.file_upload.grid_columnconfigure(0, weight=1)
         or_label = ctk.CTkLabel(master=self.file_upload, text=f'Or...')
         or_label.grid(row=0, column=0, padx=10, pady=(20, 20))
-        upload_button = ctk.CTkButton(master=self.file_upload, text='Upload File')
+        upload_button = ctk.CTkButton(master=self.file_upload, text='Upload File', command=self.upload_action)
         upload_button.grid(row=1, column=0, padx=10, pady=(0, 20))
-        supported_types = ctk.CTkLabel(master=self.file_upload, text=f'*.pdf *.txt *.docx *.doc *.csv')
+        supported_types = ctk.CTkLabel(master=self.file_upload, text=f'*.pdf *.txt *.docx *.doc *.csv\nAnd more')
         supported_types.grid(row=2, column=0, padx=10, pady=(0, 20))
 
         # create radiobutton frame
@@ -110,11 +119,6 @@ class App(ctk.CTk):
         self.scrollable_frame = ctk.CTkScrollableFrame(self, label_text='Results')
         self.scrollable_frame.grid(row=1, column=2, padx=(20, 0), pady=(20, 0), sticky='nsew')
         self.scrollable_frame.grid_columnconfigure(0, weight=1)
-        self.scrollable_frame_switches = []
-        for i in range(100):
-            switch = ctk.CTkSwitch(master=self.scrollable_frame, text=f'CTkSwitch {i}')
-            switch.grid(row=i, column=0, padx=10, pady=(0, 20))
-            self.scrollable_frame_switches.append(switch)
 
         # create checkbox and switch frame
         self.checkbox_slider_frame = ctk.CTkFrame(self)
@@ -128,6 +132,23 @@ class App(ctk.CTk):
 
     def set_defaults(self):
         self.sidebar_button_3.configure(state='disabled', text='Disabled CTkButton')
+
+    def upload_action(self):
+        filename = filedialog.askopenfilename()
+        result = fileparse.get_text(filename)
+        if result is None:
+            result = 'Could not parse file!'
+        self.textbox.delete('0.0', END)
+        self.textbox.insert('0.0', result)
+
+    def check_plagiarism(self):
+        text = self.textbox.get('0.0', END).replace('\n', '')
+        if is_internal_string(text):
+            self.textbox.delete('0.0', END)
+            self.textbox.insert('0.0', 'Please enter text to check for plagiarism!')
+            return
+        self.progressbar.configure(mode='indeterminnate')
+        self.progressbar.start()
 
 if __name__ == '__main__':
     app = App()

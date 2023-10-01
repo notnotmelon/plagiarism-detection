@@ -3,3 +3,6 @@ requests
 unidecode
 bs4
 Gunicorn
+python-docx
+tkinter
+customtkinter
