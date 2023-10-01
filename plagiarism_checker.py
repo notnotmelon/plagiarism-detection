@@ -70,7 +70,7 @@ def find_plagiarism(plagiarised_text, urls, event):
     with ThreadPoolExecutor(max_workers=5) as executor:
         executor.map(find_plagiarism_thread, urls)
     busy = False
-    percent[0] = len(plagiarised_substrings) / original_size
+    percent[0] = 1 - len(plagiarised_tokens) / original_size
     if event is not None:
         event.set()
     return plagiarised_substrings, unsearchable_urls, percent[0]

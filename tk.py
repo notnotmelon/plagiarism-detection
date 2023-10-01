@@ -31,7 +31,7 @@ def make_readable(text):
     return result
 
 def format_percentage(unsearchable_urls, percent):
-    percent = round(max(97 + random.uniform(0, 1), 1000*percent+62)) / 10
+    percent = round(percent * 1000) / 10
     return f'{percent}%' if len(unsearchable_urls) == 0 else f'>{percent}%'
 
 class ResultsWindow(ctk.CTkToplevel):
