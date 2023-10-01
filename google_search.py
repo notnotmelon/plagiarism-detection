@@ -1,4 +1,5 @@
 import requests
+from concurrent.futures import ThreadPoolExecutor
 
 # api key for google search api
 # plaintext :(   (pls dont abuse)
@@ -22,14 +23,17 @@ def search(text, results_count):
     for tokens in text:
         query = f'https://www.googleapis.com/customsearch/v1?key={api_key}&cx={cx}&q={tokens}&fields=items(title,link)'
         queries.append(query)
-        break # REMOVE THIS
     results = []
     best_results = {}
     title_link_map = {}
     with requests.Session() as s:
-        for query in queries:
-            r = s.get(query)
-            results.append(r.json())
+        def find_plagiarism_thread(query):
+            try:
+                results.append(s.get(query).json())
+            except Exception as e:
+                print(e)
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            executor.map(find_plagiarism_thread, queries)
     for result in results:
         if 'items' not in result:
             continue

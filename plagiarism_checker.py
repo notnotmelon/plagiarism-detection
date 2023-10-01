@@ -31,16 +31,18 @@ busy = False
 def is_busy():
     return busy
 
-plagiarisized_substrings = []
+plagiarised_substrings = []
 unsearchable_urls = []
+percent = [0]
 
 def results():
-    return plagiarisized_substrings, unsearchable_urls
+    return plagiarised_substrings, unsearchable_urls, percent[0]
 
 def find_plagiarism(plagiarised_text, urls, event):
     plagiarised_text = stopwords.preprocessing(plagiarised_text)
     plagiarised_tokens = plagiarised_text.split()
-    plagiarisized_substrings.clear()
+    original_size = len(plagiarised_tokens)
+    plagiarised_substrings.clear()
     unsearchable_urls.clear()
     def find_plagiarism_thread(url):
         try:
@@ -58,7 +60,7 @@ def find_plagiarism(plagiarised_text, urls, event):
                         highest_score = plagiarisism_score
                 if highest_score > 13:
                     plagiarised_substring = ' '.join(plagiarised_tokens[i:i+highest_score])
-                    plagiarisized_substrings.append((plagiarised_substring, url))
+                    plagiarised_substrings.append((plagiarised_substring, url))
                     del plagiarised_tokens[i:i+highest_score]
                     i+=highest_score
                 i += 1
@@ -68,6 +70,7 @@ def find_plagiarism(plagiarised_text, urls, event):
     with ThreadPoolExecutor(max_workers=5) as executor:
         executor.map(find_plagiarism_thread, urls)
     busy = False
+    percent[0] = len(plagiarised_substrings) / original_size
     if event is not None:
         event.set()
-    return plagiarisized_substrings, unsearchable_urls
+    return plagiarised_substrings, unsearchable_urls, percent[0]
