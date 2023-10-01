@@ -16,4 +16,4 @@ def plagiarism():
     return jsonify({'plagiarisized_substrings': plagiarisized_substrings, 'unsearchable_urls': unsearchable_urls, 'youtube_urls': youtube_urls})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False )
