@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 # api key for google search api
 # plaintext :(   (pls dont abuse)
-api_key = 'AIzaSyBWd9hccN3Xkt5uDuHBTJWWurC-zMZT1to'
+api_key = 'AIzaSyCNFq-e_lzmgQjrxWxcqbqVLoRtfrp04qE'
 
 # custom search engine id
 cx = '53e23a42524bc4913'
@@ -22,6 +22,8 @@ def search(text, results_count):
     queries = []
     for tokens in text:
         query = f'https://www.googleapis.com/customsearch/v1?key={api_key}&cx={cx}&q={tokens}&fields=items(title,link)'
+        print(query)
+        print('\n\n')
         queries.append(query)
     results = []
     best_results = {}
