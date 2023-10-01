@@ -3,6 +3,7 @@ import customtkinter as ctk
 from tkinter import filedialog
 import fileparse
 import threading
+import webbrowser
 
 import google_search
 import plagiarism_checker
@@ -15,20 +16,42 @@ def is_internal_string(text):
     text = text.replace('\n', '')
     return text == '' or text == 'Enter suspicious text here...' or text == 'Could not parse file!' or text == 'Please enter text to check for plagiarism!'
 
+# add newlines every 80 characters after spaces
+def make_readable(text):
+    result = ''
+    i = 0
+    while i < len(text):
+        result += text[i:i+80] + '\n'
+        i += 80
+    return result
+
+class ResultsWindow(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.geometry("800x300")
+
+    def process_results(self, plagiarisized_substrings, unsearchable_urls):
+        for substring, url in plagiarisized_substrings:
+            print(f'"{substring}" was plagiarized from {url}')
+            switch = ctk.CTkLabel(self, text=f'{make_readable(substring)}\n\nwas plagiarized from')
+            switch.pack(padx=20, pady=20)
+            switch = ctk.CTkButton(self, text=url, command=lambda url=url: webbrowser.open(url), fg_color='transparent', border_width=0, text_color='blue')
+            switch.pack(padx=20, pady=0)
+        for url in unsearchable_urls:
+            print('Could not search ' + url)
+            switch = ctk.CTkLabel(self, text='Could not search ' + url)
+            switch.pack(padx=20, pady=20)
+        return self
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        # configure window
         self.title('Hawkathon 2023 Plagiarism Detection Software')
         self.geometry(f'{1100}x{580}')
-
-        # configure grid layout (4x4)
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure((2, 3), weight=0)
         self.grid_rowconfigure((0, 1, 2), weight=1)
-
-        # configure window close event
         self.protocol('WM_DELETE_WINDOW', self.on_closing)
 
         # create sidebar frame with widgets
@@ -134,6 +157,13 @@ class App(ctk.CTk):
             threading.Thread(target=lambda: plagiarism_checker.find_plagiarism(text, top_urls, event)).start()
             threading.Thread(target=lambda: self.finish_check_plagiarism(event)).start()
 
+    
+    action_queue = []
+    def duqueue(self):
+        while len(self.action_queue) != 0:
+            self.action_queue[0]()
+            del self.action_queue[0]
+
     def finish_check_plagiarism(self, event):
         if event is not None:
             event.wait()
@@ -142,15 +172,8 @@ class App(ctk.CTk):
         self.progressbar.set(1)
         self.progressbar.stop()
         plagiarisized_substrings, unsearchable_urls = plagiarism_checker.results()
-        i = 0
-        for substring, url in plagiarisized_substrings:
-            print(f'"{substring}" was plagiarized from {url}')
-            switch = ctk.CTkLabel(master=self.scrollable_frame, text=f'"{substring}" was plagiarized from {url}')
-            switch.grid(row=i, column=0, padx=10, pady=(0, 20))
-        for url in unsearchable_urls:
-            print('Could not search ' + url)
-            switch = ctk.CTkLabel(master=self.scrollable_frame, text='Could not search ' + url)
-            switch.grid(row=i, column=0, padx=10, pady=(0, 20))
+        self.action_queue.append(lambda: ResultsWindow(self).process_results(plagiarisized_substrings, unsearchable_urls).focus())
+        self.after(1, self.duqueue)
 
 if __name__ == '__main__':
     app = App()
