@@ -15,6 +15,7 @@ root = ctk.CTk()
 
 github = 'https://github.com/notnotmelon/plagiarism-detection'
 discord = 'https://discord.gg/3jRh2W25ZE'
+engine = 'https://cse.google.com/cse?cx=53e23a42524bc4913'
 
 def is_internal_string(text):
     text = text.replace('\n', '')
@@ -88,6 +89,8 @@ class App(ctk.CTk):
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
         self.sidebar_button_2 = ctk.CTkButton(self.sidebar_frame, command=lambda: webbrowser.open(discord), text='Discord')
         self.sidebar_button_2.grid(row=2, column=0, padx=20, pady=10)
+        self.sidebar_button_3 = ctk.CTkButton(self.sidebar_frame, command=lambda: webbrowser.open(engine), text='Engine')
+        self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
         self.appearance_mode_label = ctk.CTkLabel(self.sidebar_frame, text='Appearance Mode', anchor='w')
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
         self.appearance_mode_optionemenu = ctk.CTkOptionMenu(self.sidebar_frame, values=['Light', 'Dark', 'System'],
