@@ -4,7 +4,7 @@ import google_search
 
 app = Flask(__name__)
 
-@app.route('/plagiarism', methods=['POST'])
+@app.route('/plagiarism', methods=['GET'])
 def plagiarism():
     text = request.json['text']
     top_urls = google_search.search(text, 10)
