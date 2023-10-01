@@ -57,11 +57,11 @@ class App(ctk.CTk):
         self.entry = ctk.CTkEntry(self, placeholder_text='CTkEntry')
         self.entry.grid(row=3, column=1, columnspan=2, padx=(20, 0), pady=(20, 20), sticky='nsew')
         self.progressbar = ctk.CTkProgressBar(self)
-        self.progressbar.grid(row=3, column=1, columnspan=2, padx=(20, 00), pady=(20, 20), sticky='nsew')
+        self.progressbar.grid(row=3, column=1, padx=(20, 00), pady=(20, 20), sticky='nsew')
         self.progressbar.set(1)
 
-        self.main_button_1 = ctk.CTkButton(master=self, fg_color='transparent', border_width=2, text_color=('gray10', '#DCE4EE'), text='Check Plagiarism', command=self.check_plagiarism)
-        self.main_button_1.grid(row=3, column=3, padx=(20, 20), pady=(20, 20), sticky='nsew')
+        self.main_button = ctk.CTkButton(master=self, fg_color='transparent', border_width=2, text_color=('gray10', '#DCE4EE'), text='Check Plagiarism', command=self.check_plagiarism)
+        self.main_button.grid(row=3, column=2, padx=(20, 20), pady=(20, 20), sticky='nsew')
 
         # create textbox
         self.textbox = ctk.CTkTextbox(self, width=250)
@@ -99,36 +99,13 @@ class App(ctk.CTk):
         or_label.grid(row=0, column=0, padx=10, pady=(20, 20))
         upload_button = ctk.CTkButton(master=self.file_upload, text='Upload File', command=self.upload_action)
         upload_button.grid(row=1, column=0, padx=10, pady=(0, 20))
-        supported_types = ctk.CTkLabel(master=self.file_upload, text=f'*.pdf *.txt *.docx *.doc *.csv\nAnd more')
+        supported_types = ctk.CTkLabel(master=self.file_upload, text=f'*.pdf *.txt *.docx *.doc *.csv\nand more')
         supported_types.grid(row=2, column=0, padx=10, pady=(0, 20))
-
-        # create radiobutton frame
-        self.radiobutton_frame = ctk.CTkFrame(self)
-        self.radiobutton_frame.grid(row=0, column=3, padx=(20, 20), pady=(20, 0), sticky='nsew')
-        self.radio_var = IntVar(value=0)
-        self.label_radio_group = ctk.CTkLabel(master=self.radiobutton_frame, text='CTkRadioButton Group:')
-        self.label_radio_group.grid(row=0, column=2, columnspan=1, padx=10, pady=10, sticky='')
-        self.radio_button_1 = ctk.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var, value=0)
-        self.radio_button_1.grid(row=1, column=2, pady=10, padx=20, sticky='n')
-        self.radio_button_2 = ctk.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var, value=1)
-        self.radio_button_2.grid(row=2, column=2, pady=10, padx=20, sticky='n')
-        self.radio_button_3 = ctk.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var, value=2)
-        self.radio_button_3.grid(row=3, column=2, pady=10, padx=20, sticky='n')
 
         # create scrollable frame
         self.scrollable_frame = ctk.CTkScrollableFrame(self, label_text='Results')
-        self.scrollable_frame.grid(row=1, column=2, padx=(20, 0), pady=(20, 0), sticky='nsew')
+        self.scrollable_frame.grid(row=1, column=2, padx=(20, 20), pady=(20, 0), sticky='nsew')
         self.scrollable_frame.grid_columnconfigure(0, weight=1)
-
-        # create checkbox and switch frame
-        self.checkbox_slider_frame = ctk.CTkFrame(self)
-        self.checkbox_slider_frame.grid(row=1, column=3, padx=(20, 20), pady=(20, 0), sticky='nsew')
-        self.checkbox_1 = ctk.CTkCheckBox(master=self.checkbox_slider_frame)
-        self.checkbox_1.grid(row=1, column=0, pady=(20, 0), padx=20, sticky='n')
-        self.checkbox_2 = ctk.CTkCheckBox(master=self.checkbox_slider_frame)
-        self.checkbox_2.grid(row=2, column=0, pady=(20, 0), padx=20, sticky='n')
-        self.checkbox_3 = ctk.CTkCheckBox(master=self.checkbox_slider_frame)
-        self.checkbox_3.grid(row=3, column=0, pady=20, padx=20, sticky='n')
 
     def set_defaults(self):
         self.sidebar_button_3.configure(state='disabled', text='Disabled CTkButton')
