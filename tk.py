@@ -1,10 +1,12 @@
+# this file builds the GUI
+# it also acts at the entrypoint for the rest of the program
+
 from tkinter import *
-import customtkinter as ctk
-from tkinter import filedialog
+import customtkinter as ctk # we use a fork of TK called customTK. it looks much nicer and has more features such as the progressbar
+from tkinter import filedialog # this is the file selection GUI. we can borrow it from vanilla TK
 import fileparse
 import threading
 import webbrowser
-import random
 
 import google_search
 import plagiarism_checker
@@ -14,9 +16,10 @@ ctk.set_default_color_theme('green')
 root = ctk.CTk()
 
 github = 'https://github.com/notnotmelon/plagiarism-detection'
-discord = 'https://discord.gg/3jRh2W25ZE'
+discord = 'https://discord.gg/3jRh2W25ZE' # acm discord
 engine = 'https://cse.google.com/cse?cx=53e23a42524bc4913'
 
+# dont let users press the button if the textfield is full of a system string
 def is_internal_string(text):
     text = text.replace('\n', '')
     return text == '' or text == 'Enter suspicious text here...' or text == 'Could not parse file!' or text == 'Please enter text to check for plagiarism!'
@@ -42,6 +45,7 @@ class ResultsWindow(ctk.CTkToplevel):
         self.scroll = ctk.CTkScrollableFrame(self, label_text='Results', width=3000, height=600, corner_radius=0)
         self.scroll.pack()
 
+    # build the 2ed window that shows the search results
     def process_results(self, plagiarisized_substrings, unsearchable_urls, percent):
         if len(plagiarisized_substrings) == 0:
             switch = ctk.CTkLabel(self.scroll, text='100% original!')
@@ -130,13 +134,11 @@ class App(ctk.CTk):
         supported_types = ctk.CTkLabel(master=self.file_upload, text=f'*.pdf *.txt *.docx *.doc *.csv\nand more')
         supported_types.grid(row=2, column=0, padx=10, pady=(0, 20))
 
-    def open_input_dialog_event(self):
-        dialog = ctk.CTkInputDialog(text='Type in a number:', title='CTkInputDialog')
-        print('CTkInputDialog:', dialog.get_input())
-
+    # handles dark mode, light mode, or system mode
     def change_appearance_mode_event(self, new_appearance_mode: str):
         ctk.set_appearance_mode(new_appearance_mode)
 
+    # handles changing the GUI scale
     def change_scaling_event(self, new_scaling: str):
         new_scaling_float = int(new_scaling.replace('%', '')) / 100
         ctk.set_widget_scaling(new_scaling_float)
@@ -173,12 +175,13 @@ class App(ctk.CTk):
             print('No results found')
             self.finish_check_plagiarism(None)
         else:
+            # run the plagarism detection algorithm on a seperate thread so that the GUI is still interactable
             event = threading.Event()
             threading.Thread(target=lambda: plagiarism_checker.find_plagiarism(text, top_urls, event)).start()
             threading.Thread(target=lambda: self.finish_check_plagiarism(event)).start()
 
     
-    action_queue = []
+    action_queue = [] # list of functions to run on a 1 tick delay. for some reason we cannot run the .focus() command on the 2ed window until after 1 tick
     def duqueue(self):
         while len(self.action_queue) != 0:
             self.action_queue[0]()
